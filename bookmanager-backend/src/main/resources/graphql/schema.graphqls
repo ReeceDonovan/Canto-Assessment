@@ -1,0 +1,16 @@
+type Query {
+    findAllBooks: [Book!]!
+    findBookById(id: Int): Book
+}
+
+type Mutation {
+    createBook(title: String!, author: String!, publishedDate: String!): Book!
+    deleteBook(id: Int!): Int!
+}
+
+type Book {
+    id: Int
+    title: String
+    author: String
+    publishedDate: String
+}

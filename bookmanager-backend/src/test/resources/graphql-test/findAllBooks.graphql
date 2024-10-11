@@ -1,0 +1,8 @@
+query findAllBooks {
+    findAllBooks {
+        id
+        title
+        author
+        publishedDate
+    }
+}
