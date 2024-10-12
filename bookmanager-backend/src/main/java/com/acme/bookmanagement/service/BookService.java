@@ -1,11 +1,14 @@
 package com.acme.bookmanagement.service;
 
-import com.acme.bookmanagement.model.Book;
-import com.acme.bookmanagement.repository.BookRepository;
-import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.acme.bookmanagement.model.Book;
+import com.acme.bookmanagement.repository.BookRepository;
 
 @Service
 public class BookService {
@@ -31,5 +34,10 @@ public class BookService {
         bookRepository.deleteById(id);
         return id;
     }
-}
 
+    public List<Book> findBooksByDateRange(LocalDate startDate, LocalDate endDate) {
+        return bookRepository.findAll().stream()
+                .filter(book -> !book.getPublishedDate().isBefore(startDate) && !book.getPublishedDate().isAfter(endDate))
+                .collect(Collectors.toList());
+    }
+}

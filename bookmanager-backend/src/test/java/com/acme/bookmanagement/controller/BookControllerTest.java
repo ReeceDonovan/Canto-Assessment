@@ -1,18 +1,24 @@
 package com.acme.bookmanagement.controller;
 
-import com.acme.bookmanagement.model.Book;
-import com.acme.bookmanagement.service.BookService;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.GraphQlTest;
-import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.graphql.test.tester.GraphQlTester;
 
-import java.time.LocalDate;
-import java.util.*;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import com.acme.bookmanagement.model.Book;
+import com.acme.bookmanagement.service.BookService;
 
 @GraphQlTest(BookController.class)
 public class BookControllerTest {
@@ -131,5 +137,31 @@ public class BookControllerTest {
                 .execute()
                 .path("deleteBook")
                 .matchesJson("1");
+    }
+
+    @Test
+    void shouldFindBooksByDate() {
+        LocalDate startDate = LocalDate.of(2021, 1, 1);
+        LocalDate endDate = LocalDate.of(2021, 12, 31);
+        List<Book> filteredBooks = books.values().stream()
+                .filter(book -> !book.getPublishedDate().isBefore(startDate) && !book.getPublishedDate().isAfter(endDate))
+                .toList();
+
+        when(this.bookService.findBooksByDateRange(startDate, endDate))
+                .thenReturn(filteredBooks);
+
+        this.graphQlTester
+                .documentName("findBooksByDate")
+                .variable("startDate", startDate.toString())
+                .variable("endDate", endDate.toString())
+                .execute()
+                .path("findBooksByDate")
+                .entityList(Book.class)
+                .hasSize(2)
+                .satisfies(books -> {
+                    assertThat(books).allMatch(book -> 
+                        !book.getPublishedDate().isBefore(startDate) && !book.getPublishedDate().isAfter(endDate)
+                    );
+                });
     }
 }

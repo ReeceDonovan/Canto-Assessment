@@ -43,4 +43,11 @@ public class BookController {
     public Long deleteBook(@Argument Long id) {
         return bookService.deleteById(id);
     }
+
+    @QueryMapping
+    public List<Book> findBooksByDate(@Argument String startDate, @Argument String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = endDate != null ? LocalDate.parse(endDate) : LocalDate.now();
+        return bookService.findBooksByDateRange(start, end);
+    }
 }

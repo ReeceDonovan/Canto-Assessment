@@ -1,0 +1,8 @@
+query findBooksByDate($startDate: String!, $endDate: String) {
+    findBooksByDate(startDate: $startDate, endDate: $endDate) {
+        id
+        title
+        author
+        publishedDate
+    }
+}

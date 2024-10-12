@@ -1,6 +1,7 @@
 type Query {
     findAllBooks: [Book!]!
     findBookById(id: Int): Book
+    findBooksByDate(startDate: String!, endDate: String): [Book!]!
 }
 
 type Mutation {
