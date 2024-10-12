@@ -39,13 +39,8 @@ public class BookController {
         return bookService.save(book);
     }
 
-    // @MutationMapping
-    // public Long deleteBook(@Argument Long id) {
-    //     return bookService.deleteById(id);
-    // }
-
     @MutationMapping
-    public Long deleteBook(@Argument Integer id) {
-        return bookService.deleteById(Long.valueOf(id));
+    public Long deleteBook(@Argument Long id) {
+        return bookService.deleteById(id);
     }
 }
