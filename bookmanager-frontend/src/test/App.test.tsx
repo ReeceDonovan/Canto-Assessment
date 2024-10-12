@@ -1,9 +1,17 @@
-import React from 'react';
-import {render, screen} from '@testing-library/react';
-import App from '../App';
+import { Provider } from 'react-redux';
 
-test('renders learn react link', () => {
-    render(<App/>);
-    const linkElement = screen.getByText(/learn react/i);
-    expect(linkElement).toBeInTheDocument();
-});
+import { render, screen } from '@testing-library/react';
+
+import App from '../App';
+import store from '../store';
+
+test('renders Book Management heading', () => {
+    // Wrap the component in a Provider with the store
+    render(
+        <Provider store={store}>
+            <App/>
+        </Provider>
+    );
+    const headingElement = screen.getByText(/Book Management/i);
+    expect(headingElement).toBeInTheDocument();
+})
