@@ -20,8 +20,8 @@ const AddBook = () => {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Add Book</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Add Book</h2>
             <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <input
@@ -29,26 +29,27 @@ const AddBook = () => {
                         placeholder="Title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                     <input
                         type="text"
                         placeholder="Author"
                         value={author}
                         onChange={(e) => setAuthor(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                     <input
                         type="date"
                         placeholder="Published Date"
+                        min="1900-01-01"
                         value={publishedDate}
                         onChange={(e) => setPublishedDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900/50 dark:text-gray-300/70 placeholder:text-gray-400 dark:placeholder:text-gray-600"
                     />
                 </div>
                 <button
                     onClick={handleAddBook}
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 flex items-center justify-center"
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors duration-300 flex items-center justify-center"
                 >
                     <PlusCircle className="w-5 h-5 mr-2" />
                     Add Book

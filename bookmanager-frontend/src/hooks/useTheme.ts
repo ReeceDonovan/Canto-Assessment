@@ -8,7 +8,7 @@ export const useTheme = () => {
             const savedTheme = localStorage.getItem('color-theme') as Theme;
             return savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         }
-        return 'light';
+        return 'dark';
     });
 
     useEffect(() => {

@@ -21,8 +21,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "npm run generate-css && react-scripts start",
+    "build": "npm run generate-css && react-scripts build",
+    "generate-css": "tailwindcss -i ./src/globals.css -o ./public/base.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

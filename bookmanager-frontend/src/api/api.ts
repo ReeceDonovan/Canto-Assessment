@@ -1,6 +1,8 @@
 import { Book } from '../features/bookReducer';
 
-const GRAPHQL_URL = 'http://localhost:8080/graphql';
+// const GRAPHQL_URL = 'http://localhost:8080/graphql';
+
+const GRAPHQL_URL = window.location.origin.replace(/:\d+/, ':8080') + '/graphql';
 
 export const fetchBooks = async (): Promise<Book[]> => {
     const response = await fetch(GRAPHQL_URL, {
