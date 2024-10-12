@@ -20,7 +20,7 @@ const BooksList = () => {
             if (startDate || endDate) {
                 const defaultStartDate = '1900-01-01';
                 const defaultEndDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-                
+
                 const effectiveStartDate = startDate || defaultStartDate;
                 const effectiveEndDate = endDate || defaultEndDate;
 
@@ -71,7 +71,7 @@ const BooksList = () => {
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="border rounded p-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70"
                     />
                 </div>
                 <div className="flex items-center">
@@ -80,7 +80,7 @@ const BooksList = () => {
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="border rounded p-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70"
                     />
                 </div>
                 <button
