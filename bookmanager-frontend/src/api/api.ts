@@ -71,11 +71,7 @@ export const deleteBook = async (id: number): Promise<number> => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            query: `mutation($id: Int!) {
-        deleteBook(id: $id) {
-          id
-        }
-      }`,
+            query: `mutation($id: Int!) { deleteBook(id: $id) }`,
             variables: { id: id },
         }),
     });
