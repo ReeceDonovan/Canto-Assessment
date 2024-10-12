@@ -11,14 +11,20 @@ const AddBook = () => {
     const [author, setAuthor] = useState('');
     const [publishedDate, setPublishedDate] = useState('');
 
+    // Log if error
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (title && author && publishedDate) {
-            const newBook = await createBook({ title, author, publishedDate });
-            dispatch(addBook(newBook));
-            setTitle('');
-            setAuthor('');
-            setPublishedDate('');
+            try {
+                const newBook = await createBook({ title, author, publishedDate });
+                dispatch(addBook(newBook));
+                setTitle('');
+                setAuthor('');
+                setPublishedDate('');
+            } catch (error) {
+                console.error('Failed to add book:', error);
+            }
         }
     };
 

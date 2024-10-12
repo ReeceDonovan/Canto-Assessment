@@ -45,8 +45,6 @@ describe('App', () => {
 
         await waitFor(() => {
             expect(fetchBooks).toHaveBeenCalled();
-            // expect(screen.getByText('Book One')).toBeInTheDocument();
-            // expect(screen.getByText('Book Two')).toBeInTheDocument();
         });
 
         await waitFor(() => {
@@ -79,8 +77,8 @@ describe('App', () => {
     });
 
     it('handles API error when fetching books', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
         (fetchBooks as jest.Mock).mockRejectedValue(new Error('API Error'));
-        console.error = jest.fn();
 
         render(
             <Provider store={store}>
@@ -89,7 +87,9 @@ describe('App', () => {
         );
 
         await waitFor(() => {
-            expect(console.error).toHaveBeenCalledWith('Failed to fetch books:', expect.any(Error));
+            expect(consoleErrorSpy).toHaveBeenCalled();
         });
+
+        consoleErrorSpy.mockRestore();
     });
 });

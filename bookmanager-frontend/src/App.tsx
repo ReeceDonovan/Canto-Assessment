@@ -12,8 +12,12 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const loadBooks = async () => {
-            const books = await fetchBooks();
-            dispatch(setBooks(books));
+            try {
+                const books = await fetchBooks();
+                dispatch(setBooks(books));
+            } catch (error) {
+                console.error('Failed to fetch books:', error);
+            }
         };
 
         loadBooks();

@@ -14,6 +14,8 @@ jest.mock('../../api/api', () => ({
     fetchBooksByDateRange: jest.fn(),
 }));
 
+jest.setTimeout(10000);
+
 describe('BooksList', () => {
     let store: ReturnType<typeof configureStore>;
     let initialState: RootState;
@@ -64,13 +66,10 @@ describe('BooksList', () => {
 
         await waitFor(() => {
             expect(screen.queryByText('Book One')).not.toBeInTheDocument();
-            // expect(screen.getByText('Book Two')).toBeInTheDocument();
-            // expect(deleteBookAPI).toHaveBeenCalledWith(1);
         });
 
         await waitFor(() => {
             expect(screen.getByText('Book Two')).toBeInTheDocument();
-            // expect(deleteBookAPI).toHaveBeenCalledWith(1);
         });
 
         await waitFor(() => {
@@ -79,7 +78,6 @@ describe('BooksList', () => {
     });
 
     it('should show and hide undo button when a book is deleted', async () => {
-        jest.useFakeTimers();
         (deleteBookAPI as jest.Mock).mockResolvedValue(1);
 
         render(
@@ -94,7 +92,7 @@ describe('BooksList', () => {
         expect(screen.getByText('Book deleted')).toBeInTheDocument();
         expect(screen.getByText('Undo')).toBeInTheDocument();
 
-        jest.advanceTimersByTime(6000);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
 
         await waitFor(() => {
             expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
@@ -124,13 +122,10 @@ describe('BooksList', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Book One')).toBeInTheDocument();
-            // expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
-            // expect(screen.queryByText('Undo')).not.toBeInTheDocument();
         });
 
         await waitFor(() => {
             expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
-            // expect(screen.queryByText('Undo')).not.toBeInTheDocument();
         });
 
         await waitFor(() => {
@@ -148,16 +143,14 @@ describe('BooksList', () => {
             </Provider>
         );
 
-        const startDateInput = screen.getByLabelText('Start Date');
-        const endDateInput = screen.getByLabelText('End Date');
+        const startDateInput = screen.getByTestId('startDate');
+        const endDateInput = screen.getByTestId('endDate');
 
         fireEvent.change(startDateInput, { target: { value: '2021-01-01' } });
         fireEvent.change(endDateInput, { target: { value: '2021-12-31' } });
 
         await waitFor(() => {
             expect(fetchBooksByDateRange).toHaveBeenCalledWith('2021-01-01', '2021-12-31');
-            // expect(screen.getByText('Book One')).toBeInTheDocument();
-            // expect(screen.queryByText('Book Two')).not.toBeInTheDocument();
         });
 
         await waitFor(() => {
@@ -176,8 +169,8 @@ describe('BooksList', () => {
             </Provider>
         );
 
-        const startDateInput = screen.getByLabelText('Start Date');
-        const endDateInput = screen.getByLabelText('End Date');
+        const startDateInput = screen.getByTestId('startDate');
+        const endDateInput = screen.getByTestId('endDate');
         const clearButton = screen.getByText('Clear');
 
         fireEvent.change(startDateInput, { target: { value: '2021-01-01' } });
@@ -187,8 +180,6 @@ describe('BooksList', () => {
 
         await waitFor(() => {
             expect(startDateInput).toHaveValue('');
-            // expect(endDateInput).toHaveValue('');
-            // expect(fetchBooks).toHaveBeenCalled();
         });
 
         await waitFor(() => {

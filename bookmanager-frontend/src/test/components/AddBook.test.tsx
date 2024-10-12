@@ -59,8 +59,6 @@ describe('AddBook', () => {
 
         await waitFor(() => {
             expect(titleInput).toHaveValue('');
-            // expect(authorInput).toHaveValue('');
-            // expect(publishedDateInput).toHaveValue('');
         });
 
         await waitFor(() => {
@@ -85,7 +83,6 @@ describe('AddBook', () => {
 
         await waitFor(() => {
             expect(createBook).not.toHaveBeenCalled();
-            // expect(store.dispatch).not.toHaveBeenCalled();
         });
 
         await waitFor(() => {
@@ -116,7 +113,6 @@ describe('AddBook', () => {
 
         await waitFor(() => {
             expect(console.error).toHaveBeenCalledWith('Failed to add book:', expect.any(Error));
-            // expect(store.dispatch).not.toHaveBeenCalled();
         });
 
         await waitFor(() => {
