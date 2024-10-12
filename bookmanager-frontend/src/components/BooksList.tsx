@@ -64,7 +64,7 @@ const BooksList = () => {
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Books</h2>
 
             {/* Date filter inputs */}
-            <div className="mb-4 flex items-center space-x-4">
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
                 <div className="flex items-center">
                     <Calendar className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2" />
                     <input
@@ -72,16 +72,16 @@ const BooksList = () => {
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         data-testid="startDate"
-                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70"
+                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70 w-full sm:w-auto"
                     />
                 </div>
                 <div className="flex items-center">
-                    <span className="text-gray-500 dark:text-gray-400 mx-2">to</span>
+                    <span className="text-gray-500 dark:text-gray-400 mr-2 sm:mx-2">to</span>
                     <input
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70"
+                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70 w-full sm:w-auto"
                         data-testid="endDate"
                     />
                 </div>
@@ -90,7 +90,7 @@ const BooksList = () => {
                         setStartDate('');
                         setEndDate('');
                     }}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 w-full sm:w-auto text-center sm:text-left"
                 >
                     Clear
                 </button>
