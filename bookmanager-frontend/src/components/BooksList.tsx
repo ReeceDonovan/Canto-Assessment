@@ -74,7 +74,7 @@ const BooksList = () => {
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         data-testid="startDate"
-                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-300 w-full sm:w-auto"
+                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70 w-full sm:w-auto"
                         aria-label="Start Date"
                     />
                 </div>
@@ -86,7 +86,7 @@ const BooksList = () => {
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-300 w-full sm:w-auto"
+                        className="border rounded p-1 text-sm bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900/50 dark:text-gray-300/70 w-full sm:w-auto"
                         data-testid="endDate"
                         aria-label="End Date"
                     />
