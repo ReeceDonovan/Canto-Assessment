@@ -6,6 +6,10 @@
     #root {
         color-scheme: light dark;
     }
+
+    main {
+        @apply px-4 min-h-screen sm:px-0 space-y-16 w-full py-6;
+    }
 }
 
 @tailwind components;

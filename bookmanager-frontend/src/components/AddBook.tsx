@@ -29,7 +29,8 @@ const AddBook = () => {
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+        // <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 max-w-[calc(100vw-2rem)] mx-auto">
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Add Book</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

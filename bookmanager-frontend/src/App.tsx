@@ -24,15 +24,15 @@ const App: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8 antialiased mx-auto w-full">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8 antialiased mx-auto w-full max-w-screen">
             <div className="w-fit">
                 <ThemeToggle />
             </div>
-            <div className="pt-12 size-fit mx-auto">
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-8">Book Management</h1>
+            <main className="pt-12 size-min sm:size-fit mx-auto w-auto">
+                <h1 className="text-3xl sm:text-4xl text-center sm:text-left font-bold text-gray-800 dark:text-gray-200 mb-8">Book Management</h1>
                 <AddBook />
                 <BooksList />
-            </div>
+            </main>
         </div>
     );
 };
