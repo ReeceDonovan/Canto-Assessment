@@ -33,7 +33,7 @@ const AddBook = () => {
                 onChange={(e) => setAuthor(e.target.value)}
             />
             <input
-                type="text"
+                type="date"
                 placeholder="Published Date"
                 value={publishedDate}
                 onChange={(e) => setPublishedDate(e.target.value)}

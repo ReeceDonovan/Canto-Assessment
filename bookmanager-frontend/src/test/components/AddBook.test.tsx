@@ -2,7 +2,7 @@ import {createBook} from "../../api/api";
 import React from "react";
 import {Provider} from "react-redux";
 import AddBook from "../../components/AddBook";
-import {fireEvent, render, waitFor} from "@testing-library/react";
+import {fireEvent, render, screen, waitFor} from "@testing-library/react";
 import {configureStore} from "@reduxjs/toolkit";
 import booksReducer from "../../features/bookReducer";
 
@@ -25,16 +25,16 @@ describe('BooksList', () => {
     });
 
     it('should clear title, author and publishedDate when a book is added', async () => {
-        const { getByPlaceholderText, getByText } = render(
+        render(
             <Provider store={store}>
                 <AddBook />
             </Provider>
         );
 
-        const titleInput = getByPlaceholderText('Title');
-        const authorInput = getByPlaceholderText('Author');
-        const publishedDateInput = getByPlaceholderText('Published Date');
-        const addButton = getByText('Add');
+        const titleInput = screen.getByPlaceholderText('Title');
+        const authorInput = screen.getByPlaceholderText('Author');
+        const publishedDateInput = screen.getByPlaceholderText('Published Date');
+        const addButton = screen.getByText('Add');
 
         fireEvent.change(titleInput, { target: { value: 'Test Book' } });
         fireEvent.change(authorInput, { target: { value: 'Test Author' } });
@@ -44,9 +44,8 @@ describe('BooksList', () => {
 
         await waitFor(() => {
             expect(titleInput).toHaveValue('');
-            expect(authorInput).toHaveValue('');
-            expect(publishedDateInput).toHaveValue('');
         });
+        expect(authorInput).toHaveValue('');
+        expect(publishedDateInput).toHaveValue('');
     });
-
 });
