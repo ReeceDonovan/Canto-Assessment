@@ -2,7 +2,7 @@ import { Book, Calendar, RotateCcw, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { deleteBook as deleteBookAPI, fetchBooksByDateRange } from '../api/api';
+import { deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange } from '../api/api';
 import { deleteBook, setBooks, undoDeleteBook } from '../features/bookReducer';
 import { RootState } from '../store';
 
@@ -15,19 +15,23 @@ const BooksList = () => {
     const [endDate, setEndDate] = useState('');
 
     const handleDateFilter = useCallback(async () => {
-        if (startDate || endDate) {
-            try {
+        try {
+            let filteredBooks;
+            if (startDate || endDate) {
                 const defaultStartDate = '1900-01-01';
                 const defaultEndDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
                 
                 const effectiveStartDate = startDate || defaultStartDate;
                 const effectiveEndDate = endDate || defaultEndDate;
 
-                const filteredBooks = await fetchBooksByDateRange(effectiveStartDate, effectiveEndDate);
-                dispatch(setBooks(filteredBooks));
-            } catch (error) {
-                console.error('Failed to fetch filtered books:', error);
+                filteredBooks = await fetchBooksByDateRange(effectiveStartDate, effectiveEndDate);
+            } else {
+                // If both dates are empty, fetch all books
+                filteredBooks = await fetchBooks();
             }
+            dispatch(setBooks(filteredBooks));
+        } catch (error) {
+            console.error('Failed to fetch books:', error);
         }
     }, [startDate, endDate, dispatch]);
 
@@ -79,6 +83,15 @@ const BooksList = () => {
                         className="border rounded p-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
                     />
                 </div>
+                <button
+                    onClick={() => {
+                        setStartDate('');
+                        setEndDate('');
+                    }}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                >
+                    Clear
+                </button>
             </div>
 
             {/* Undo delete notification */}
