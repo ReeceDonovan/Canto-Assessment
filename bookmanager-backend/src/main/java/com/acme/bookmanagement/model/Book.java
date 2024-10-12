@@ -1,11 +1,11 @@
 package com.acme.bookmanagement.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
-import java.time.LocalDate;
 
 @Entity
 public class Book {
@@ -15,6 +15,10 @@ public class Book {
     private String title;
     private String author;
     private LocalDate publishedDate;
+
+    // Add a default constructor
+    public Book() {
+    }
 
     public Book(Long id, String title, String author, LocalDate publishedDate) {
         this.id = id;
@@ -56,4 +60,3 @@ public class Book {
         this.publishedDate = publishedDate;
     }
 }
-
