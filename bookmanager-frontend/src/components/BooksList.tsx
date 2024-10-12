@@ -10,11 +10,17 @@ const BooksList = () => {
     const dispatch = useDispatch();
 
     const handleDeleteBook = async (id: number) => {
+        // Optimistically update UI
+        dispatch(deleteBook(id));
+
         try {
+            // Then perform the API call
             await deleteBookAPI(id);
-            dispatch(deleteBook(id));
         } catch (error) {
             console.error('Failed to delete book:', error);
+            // If the API call fails, I might want to revert the deletion
+            // This would require implementing a "undoDeleteBook" action in your reducer
+            // dispatch(undoDeleteBook(id));
         }
     };
 

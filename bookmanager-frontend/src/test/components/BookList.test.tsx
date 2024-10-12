@@ -51,7 +51,7 @@ describe('BooksList', () => {
         expect(screen.getByText('Published: 2022-02-02')).toBeInTheDocument();
     });
 
-    it('should delete a book when delete button is clicked', async () => {
+    it('should immediately remove a book from UI when delete button is clicked', () => {
         (deleteBookAPI as jest.Mock).mockResolvedValue(1);
 
         render(
@@ -60,17 +60,16 @@ describe('BooksList', () => {
             </Provider>
         );
 
+        expect(screen.getByText('Book One')).toBeInTheDocument();
+
         const deleteButtons = screen.getAllByLabelText(/Delete/);
         fireEvent.click(deleteButtons[0]);
 
-        await waitFor(() => {
-            expect(deleteBookAPI).toHaveBeenCalledWith(1);
-        });
-
-        await waitFor(() => {
-            expect(screen.queryByText('Book One')).not.toBeInTheDocument();
-        });
-
+        // Check that the book is immediately removed from the UI
+        expect(screen.queryByText('Book One')).not.toBeInTheDocument();
         expect(screen.getByText('Book Two')).toBeInTheDocument();
+
+        // Verify that the API was called
+        expect(deleteBookAPI).toHaveBeenCalledWith(1);
     });
 });
