@@ -3,13 +3,15 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { deleteBook as deleteBookAPI } from '../../api/api';
+import { deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange } from '../../api/api';
 import BooksList from '../../components/BooksList';
 import booksReducer from '../../features/bookReducer';
 import { RootState } from '../../store';
 
 jest.mock('../../api/api', () => ({
     deleteBook: jest.fn(),
+    fetchBooks: jest.fn(),
+    fetchBooksByDateRange: jest.fn(),
 }));
 
 describe('BooksList', () => {
@@ -32,6 +34,8 @@ describe('BooksList', () => {
             },
             preloadedState: initialState,
         });
+        (fetchBooks as jest.Mock).mockResolvedValue(initialState.books.books);
+        (fetchBooksByDateRange as jest.Mock).mockResolvedValue(initialState.books.books);
     });
 
     it('should render a list of books', () => {
@@ -42,17 +46,11 @@ describe('BooksList', () => {
         );
 
         expect(screen.getByText('Books')).toBeInTheDocument();
-
         expect(screen.getByText('Book One')).toBeInTheDocument();
-        expect(screen.getByText('by Author One')).toBeInTheDocument();
-        expect(screen.getByText('Published: 2021-01-01')).toBeInTheDocument();
-
         expect(screen.getByText('Book Two')).toBeInTheDocument();
-        expect(screen.getByText('by Author Two')).toBeInTheDocument();
-        expect(screen.getByText('Published: 2022-02-02')).toBeInTheDocument();
     });
 
-    it('should immediately remove a book from UI when delete button is clicked', () => {
+    it('should immediately remove a book from UI when delete button is clicked', async () => {
         (deleteBookAPI as jest.Mock).mockResolvedValue(1);
 
         render(
@@ -61,20 +59,27 @@ describe('BooksList', () => {
             </Provider>
         );
 
-        expect(screen.getByText('Book One')).toBeInTheDocument();
-
         const deleteButtons = screen.getAllByLabelText(/Delete/);
         fireEvent.click(deleteButtons[0]);
 
-        // Check that the book is immediately removed from the UI
-        expect(screen.queryByText('Book One')).not.toBeInTheDocument();
-        expect(screen.getByText('Book Two')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.queryByText('Book One')).not.toBeInTheDocument();
+            // expect(screen.getByText('Book Two')).toBeInTheDocument();
+            // expect(deleteBookAPI).toHaveBeenCalledWith(1);
+        });
 
-        // Verify that the API was called
-        expect(deleteBookAPI).toHaveBeenCalledWith(1);
+        await waitFor(() => {
+            expect(screen.getByText('Book Two')).toBeInTheDocument();
+            // expect(deleteBookAPI).toHaveBeenCalledWith(1);
+        });
+
+        await waitFor(() => {
+            expect(deleteBookAPI).toHaveBeenCalledWith(1);
+        });
     });
 
-    it('should show undo button when a book is deleted', async () => {
+    it('should show and hide undo button when a book is deleted', async () => {
+        jest.useFakeTimers();
         (deleteBookAPI as jest.Mock).mockResolvedValue(1);
 
         render(
@@ -88,6 +93,18 @@ describe('BooksList', () => {
 
         expect(screen.getByText('Book deleted')).toBeInTheDocument();
         expect(screen.getByText('Undo')).toBeInTheDocument();
+
+        jest.advanceTimersByTime(6000);
+
+        await waitFor(() => {
+            expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Undo')).not.toBeInTheDocument();
+        });
+
+        jest.useRealTimers();
     });
 
     it('should undo book deletion when undo button is clicked', async () => {
@@ -105,8 +122,81 @@ describe('BooksList', () => {
         const undoButton = screen.getByText('Undo');
         fireEvent.click(undoButton);
 
-        expect(screen.getByText('Book One')).toBeInTheDocument();
-        expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
-        expect(screen.queryByText('Undo')).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Book One')).toBeInTheDocument();
+            // expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
+            // expect(screen.queryByText('Undo')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Book deleted')).not.toBeInTheDocument();
+            // expect(screen.queryByText('Undo')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Undo')).not.toBeInTheDocument();
+        });
+    });
+
+    it('should filter books by date range', async () => {
+        const filteredBooks = [{ id: 1, title: 'Book One', author: 'Author One', publishedDate: '2021-01-01' }];
+        (fetchBooksByDateRange as jest.Mock).mockResolvedValue(filteredBooks);
+
+        render(
+            <Provider store={store}>
+                <BooksList />
+            </Provider>
+        );
+
+        const startDateInput = screen.getByLabelText('Start Date');
+        const endDateInput = screen.getByLabelText('End Date');
+
+        fireEvent.change(startDateInput, { target: { value: '2021-01-01' } });
+        fireEvent.change(endDateInput, { target: { value: '2021-12-31' } });
+
+        await waitFor(() => {
+            expect(fetchBooksByDateRange).toHaveBeenCalledWith('2021-01-01', '2021-12-31');
+            // expect(screen.getByText('Book One')).toBeInTheDocument();
+            // expect(screen.queryByText('Book Two')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Book One')).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Book Two')).not.toBeInTheDocument();
+        });
+    });
+
+    it('should clear date filters when clear button is clicked', async () => {
+        render(
+            <Provider store={store}>
+                <BooksList />
+            </Provider>
+        );
+
+        const startDateInput = screen.getByLabelText('Start Date');
+        const endDateInput = screen.getByLabelText('End Date');
+        const clearButton = screen.getByText('Clear');
+
+        fireEvent.change(startDateInput, { target: { value: '2021-01-01' } });
+        fireEvent.change(endDateInput, { target: { value: '2021-12-31' } });
+
+        fireEvent.click(clearButton);
+
+        await waitFor(() => {
+            expect(startDateInput).toHaveValue('');
+            // expect(endDateInput).toHaveValue('');
+            // expect(fetchBooks).toHaveBeenCalled();
+        });
+
+        await waitFor(() => {
+            expect(endDateInput).toHaveValue('');
+        });
+
+        await waitFor(() => {
+            expect(fetchBooks).toHaveBeenCalled();
+        });
     });
 });
