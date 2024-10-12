@@ -15,9 +15,15 @@ const BooksList = () => {
     const [endDate, setEndDate] = useState('');
 
     const handleDateFilter = useCallback(async () => {
-        if (startDate) {
+        if (startDate || endDate) {
             try {
-                const filteredBooks = await fetchBooksByDateRange(startDate, endDate || undefined);
+                const defaultStartDate = '1900-01-01';
+                const defaultEndDate = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
+                
+                const effectiveStartDate = startDate || defaultStartDate;
+                const effectiveEndDate = endDate || defaultEndDate;
+
+                const filteredBooks = await fetchBooksByDateRange(effectiveStartDate, effectiveEndDate);
                 dispatch(setBooks(filteredBooks));
             } catch (error) {
                 console.error('Failed to fetch filtered books:', error);
