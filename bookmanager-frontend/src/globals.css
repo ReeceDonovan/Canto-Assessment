@@ -1,0 +1,18 @@
+@tailwind base;
+
+@layer base {
+
+    :root,
+    #root {
+        color-scheme: light dark;
+    }
+}
+
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}
