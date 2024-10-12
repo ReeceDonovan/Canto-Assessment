@@ -1,16 +1,17 @@
 package com.acme.bookmanagement.controller;
 
-import com.acme.bookmanagement.model.Book;
-import com.acme.bookmanagement.service.BookService;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import com.acme.bookmanagement.model.Book;
+import com.acme.bookmanagement.service.BookService;
 
 @Controller
 @RequestMapping("/graphql")
@@ -38,8 +39,13 @@ public class BookController {
         return bookService.save(book);
     }
 
+    // @MutationMapping
+    // public Long deleteBook(@Argument Long id) {
+    //     return bookService.deleteById(id);
+    // }
+
     @MutationMapping
-    public Long deleteBook(@Argument Long id) {
-        return bookService.deleteById(id);
+    public Long deleteBook(@Argument Integer id) {
+        return bookService.deleteById(Long.valueOf(id));
     }
 }
