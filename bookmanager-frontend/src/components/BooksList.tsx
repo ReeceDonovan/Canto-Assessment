@@ -1,9 +1,9 @@
-import { Book, RotateCcw, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Book, Calendar, RotateCcw, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { deleteBook as deleteBookAPI } from '../api/api';
-import { deleteBook, undoDeleteBook } from '../features/bookReducer';
+import { deleteBook as deleteBookAPI, fetchBooksByDateRange } from '../api/api';
+import { deleteBook, setBooks, undoDeleteBook } from '../features/bookReducer';
 import { RootState } from '../store';
 
 const BooksList = () => {
@@ -11,6 +11,23 @@ const BooksList = () => {
     const deletedBook = useSelector((state: RootState) => state.books.deletedBook);
     const dispatch = useDispatch();
     const [isUndoVisible, setIsUndoVisible] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+
+    const handleDateFilter = useCallback(async () => {
+        if (startDate) {
+            try {
+                const filteredBooks = await fetchBooksByDateRange(startDate, endDate || undefined);
+                dispatch(setBooks(filteredBooks));
+            } catch (error) {
+                console.error('Failed to fetch filtered books:', error);
+            }
+        }
+    }, [startDate, endDate, dispatch]);
+
+    useEffect(() => {
+        handleDateFilter();
+    }, [handleDateFilter]);
 
     const handleDeleteBook = async (id: number) => {
         dispatch(deleteBook(id));
@@ -35,6 +52,30 @@ const BooksList = () => {
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Books</h2>
+
+            {/* Date filter inputs */}
+            <div className="mb-4 flex items-center space-x-4">
+                <div className="flex items-center">
+                    <Calendar className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2" />
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="border rounded p-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                    />
+                </div>
+                <div className="flex items-center">
+                    <span className="text-gray-500 dark:text-gray-400 mx-2">to</span>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="border rounded p-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                    />
+                </div>
+            </div>
+
+            {/* Undo delete notification */}
             {isUndoVisible && deletedBook && (
                 <div className="mb-4 flex items-center justify-between bg-blue-100 dark:bg-blue-900 p-2 rounded">
                     <span className="text-blue-800 dark:text-blue-200">Book deleted</span>
@@ -47,6 +88,8 @@ const BooksList = () => {
                     </button>
                 </div>
             )}
+
+            {/* Book list */}
             <ul className="space-y-4">
                 {books.map(book => (
                     <li key={book.id} className="flex items-start justify-between space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
