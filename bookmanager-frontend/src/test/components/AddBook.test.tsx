@@ -35,8 +35,8 @@ describe('AddBook', () => {
         expect(screen.getByText('Add Book')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Title')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Author')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Published Date')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('PublishedDate')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Add Book' })).toBeInTheDocument();
     });
 
     it('should clear title, author and publishedDate when a book is added', async () => {
@@ -48,7 +48,7 @@ describe('AddBook', () => {
 
         const titleInput = screen.getByPlaceholderText('Title');
         const authorInput = screen.getByPlaceholderText('Author');
-        const publishedDateInput = screen.getByPlaceholderText('Published Date');
+        const publishedDateInput = screen.getByPlaceholderText('PublishedDate');
         const addButton = screen.getByText('Add');
 
         fireEvent.change(titleInput, { target: { value: 'Test Book' } });
@@ -102,7 +102,7 @@ describe('AddBook', () => {
 
         const titleInput = screen.getByPlaceholderText('Title');
         const authorInput = screen.getByPlaceholderText('Author');
-        const publishedDateInput = screen.getByPlaceholderText('Published Date');
+        const publishedDateInput = screen.getByPlaceholderText('PublishedDate');
         const addButton = screen.getByText('Add');
 
         fireEvent.change(titleInput, { target: { value: 'Test Book' } });

@@ -25,22 +25,30 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 lg:p-8 antialiased mx-auto w-full max-w-screen">
-            <header>
-                <div className="w-fit" aria-label="Theme toggle">
-                    <ThemeToggle />
-                </div>
-            </header>
-            <main className="pt-12 size-min sm:size-fit mx-auto w-auto" role="main" aria-labelledby="main-heading">
-                <h1 id="main-heading" className="text-3xl sm:text-4xl text-center sm:text-left font-bold text-gray-800 dark:text-gray-200 mb-8">Book Management</h1>
-                <section aria-label="Add new book">
-                    <AddBook />
-                </section>
-                <section aria-label="Book list">
-                    <BooksList />
-                </section>
-            </main>
+            <Header />
+            <Main />
         </div>
     );
 };
+
+const Header: React.FC = () => (
+    <header>
+        <div className="w-fit" aria-label="Theme toggle">
+            <ThemeToggle />
+        </div>
+    </header>
+);
+
+const Main: React.FC = () => (
+    <main className="pt-12 size-min sm:size-fit mx-auto w-auto" role="main" aria-labelledby="main-heading">
+        <h1 id="main-heading" className="text-3xl sm:text-4xl text-center sm:text-left font-bold text-gray-800 dark:text-gray-200 mb-8">Book Management</h1>
+        <section aria-label="Add new book">
+            <AddBook />
+        </section>
+        <section aria-label="Book list">
+            <BooksList />
+        </section>
+    </main>
+);
 
 export default App;
