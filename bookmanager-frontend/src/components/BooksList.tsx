@@ -1,32 +1,52 @@
-import { Book, Trash2 } from 'lucide-react';
+import { Book, RotateCcw, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { deleteBook as deleteBookAPI } from '../api/api';
-import { deleteBook } from '../features/bookReducer';
+import { deleteBook, undoDeleteBook } from '../features/bookReducer';
 import { RootState } from '../store';
 
 const BooksList = () => {
     const books = useSelector((state: RootState) => state.books.books);
+    const deletedBook = useSelector((state: RootState) => state.books.deletedBook);
     const dispatch = useDispatch();
+    const [isUndoVisible, setIsUndoVisible] = useState(false);
 
     const handleDeleteBook = async (id: number) => {
-        // Optimistically update UI
         dispatch(deleteBook(id));
+        setIsUndoVisible(true);
 
         try {
-            // Then perform the API call
             await deleteBookAPI(id);
+            // Hide undo button after successful deletion
+            setTimeout(() => setIsUndoVisible(false), 5000);
         } catch (error) {
             console.error('Failed to delete book:', error);
-            // If the API call fails, I might want to revert the deletion
-            // This would require implementing a "undoDeleteBook" action in your reducer
-            // dispatch(undoDeleteBook(id));
+            dispatch(undoDeleteBook());
+            setIsUndoVisible(false);
         }
+    };
+
+    const handleUndoDelete = () => {
+        dispatch(undoDeleteBook());
+        setIsUndoVisible(false);
     };
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Books</h2>
+            {isUndoVisible && deletedBook && (
+                <div className="mb-4 flex items-center justify-between bg-blue-100 dark:bg-blue-900 p-2 rounded">
+                    <span className="text-blue-800 dark:text-blue-200">Book deleted</span>
+                    <button
+                        onClick={handleUndoDelete}
+                        className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                    >
+                        <RotateCcw className="w-4 h-4 mr-1" />
+                        Undo
+                    </button>
+                </div>
+            )}
             <ul className="space-y-4">
                 {books.map(book => (
                     <li key={book.id} className="flex items-start justify-between space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
