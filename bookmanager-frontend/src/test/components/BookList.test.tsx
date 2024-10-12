@@ -1,11 +1,16 @@
 import { Provider } from 'react-redux';
 
 import { configureStore } from '@reduxjs/toolkit';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
+import { deleteBook as deleteBookAPI } from '../../api/api';
 import BooksList from '../../components/BooksList';
 import booksReducer from '../../features/bookReducer';
 import { RootState } from '../../store';
+
+jest.mock('../../api/api', () => ({
+    deleteBook: jest.fn(),
+}));
 
 describe('BooksList', () => {
     let store: ReturnType<typeof configureStore>;
@@ -36,8 +41,7 @@ describe('BooksList', () => {
         );
 
         expect(screen.getByText('Books')).toBeInTheDocument();
-        
-        // Check for individual elements instead of the entire string
+
         expect(screen.getByText('Book One')).toBeInTheDocument();
         expect(screen.getByText('by Author One')).toBeInTheDocument();
         expect(screen.getByText('Published: 2021-01-01')).toBeInTheDocument();
@@ -45,5 +49,28 @@ describe('BooksList', () => {
         expect(screen.getByText('Book Two')).toBeInTheDocument();
         expect(screen.getByText('by Author Two')).toBeInTheDocument();
         expect(screen.getByText('Published: 2022-02-02')).toBeInTheDocument();
+    });
+
+    it('should delete a book when delete button is clicked', async () => {
+        (deleteBookAPI as jest.Mock).mockResolvedValue(1);
+
+        render(
+            <Provider store={store}>
+                <BooksList />
+            </Provider>
+        );
+
+        const deleteButtons = screen.getAllByLabelText(/Delete/);
+        fireEvent.click(deleteButtons[0]);
+
+        await waitFor(() => {
+            expect(deleteBookAPI).toHaveBeenCalledWith(1);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Book One')).not.toBeInTheDocument();
+        });
+
+        expect(screen.getByText('Book Two')).toBeInTheDocument();
     });
 });
