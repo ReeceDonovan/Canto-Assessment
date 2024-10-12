@@ -1,11 +1,11 @@
-import {Book} from '../features/bookReducer';
+import { Book } from '../features/bookReducer';
 
 const GRAPHQL_URL = 'http://localhost:8080/graphql';
 
 export const fetchBooks = async (): Promise<Book[]> => {
     const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             query: `{
         findAllBooks {
@@ -18,14 +18,14 @@ export const fetchBooks = async (): Promise<Book[]> => {
         }),
     });
 
-    const {data} = await response.json();
+    const { data } = await response.json();
     return data.findAllBooks;
 };
 
 export const fetchBookById = async (id: number): Promise<Book> => {
     const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             query: `{
         findBookById {
@@ -35,18 +35,18 @@ export const fetchBookById = async (id: number): Promise<Book> => {
           publishedDate
         }
       }`,
-            variables: {id: id},
+            variables: { id: id },
         }),
     });
 
-    const {data} = await response.json();
+    const { data } = await response.json();
     return data.findBookById;
 };
 
 export const createBook = async (book: Omit<Book, 'id'>): Promise<Book> => {
     const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             query: `mutation($title: String!, $author: String!, $publishedDate: String!) {
         createBook(title: $title, author: $author, publishedDate: $publishedDate) {
@@ -60,24 +60,24 @@ export const createBook = async (book: Omit<Book, 'id'>): Promise<Book> => {
         }),
     });
 
-    const {data} = await response.json();
+    const { data } = await response.json();
     return data.createBook;
 };
 
 export const deleteBook = async (id: number): Promise<number> => {
     const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             query: `mutation($id: Int!) {
         deleteBook(id: $id) {
           id
         }
       }`,
-            variables: {id: id},
+            variables: { id: id },
         }),
     });
 
-    const {data} = await response.json();
+    const { data } = await response.json();
     return data.deleteBook;
 };

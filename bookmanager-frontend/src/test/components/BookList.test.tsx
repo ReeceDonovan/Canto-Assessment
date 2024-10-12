@@ -1,10 +1,11 @@
-import React from 'react';
-import { configureStore } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
-import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
+import { render } from '@testing-library/react';
+
 import BooksList from '../../components/BooksList';
 import booksReducer from '../../features/bookReducer';
+import { RootState } from '../../store';
 
 describe('BooksList', () => {
     let store: ReturnType<typeof configureStore>;

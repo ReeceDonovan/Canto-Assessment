@@ -1,9 +1,10 @@
-import React, {useEffect} from 'react';
-import {useDispatch} from 'react-redux';
-import {setBooks} from './features/bookReducer';
-import BooksList from './components/BooksList';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { fetchBooks } from './api/api';
 import AddBook from './components/AddBook';
-import {fetchBooks} from './api/api';
+import BooksList from './components/BooksList';
+import { setBooks } from './features/bookReducer';
 
 const App: React.FC = () => {
     const dispatch = useDispatch();

@@ -1,10 +1,11 @@
-import {createBook} from "../../api/api";
-import React from "react";
-import {Provider} from "react-redux";
-import AddBook from "../../components/AddBook";
-import {fireEvent, render, screen, waitFor} from "@testing-library/react";
-import {configureStore} from "@reduxjs/toolkit";
-import booksReducer from "../../features/bookReducer";
+import { Provider } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+
+import { createBook } from '../../api/api';
+import AddBook from '../../components/AddBook';
+import booksReducer from '../../features/bookReducer';
 
 jest.mock('../../api/api');
 jest.mock('../../features/bookReducer', () => ({
