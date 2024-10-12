@@ -886,10 +886,6 @@ main {
   color: rgb(17 24 39 / var(--tw-text-opacity));
 }
 
-.text-gray-900\/50 {
-  color: rgb(17 24 39 / 0.5);
-}
-
 .text-red-500 {
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
@@ -1032,10 +1028,6 @@ main {
 .dark\:text-gray-300:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(209 213 219 / var(--tw-text-opacity));
-}
-
-.dark\:text-gray-300\/70:is(.dark *) {
-  color: rgb(209 213 219 / 0.7);
 }
 
 .dark\:text-gray-400:is(.dark *) {
