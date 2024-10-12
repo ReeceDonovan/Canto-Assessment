@@ -79,3 +79,26 @@ export const deleteBook = async (id: number): Promise<number> => {
     const { data } = await response.json();
     return data.deleteBook;
 };
+
+export const fetchBooksByDateRange = async (startDate: string, endDate?: string): Promise<Book[]> => {
+  const response = await fetch(GRAPHQL_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: `
+        query($startDate: String!, $endDate: String) {
+          findBooksByDate(startDate: $startDate, endDate: $endDate) {
+            id
+            title
+            author
+            publishedDate
+          }
+        }
+      `,
+      variables: { startDate, endDate },
+    }),
+  });
+
+  const { data } = await response.json();
+  return data.findBooksByDate;
+};
