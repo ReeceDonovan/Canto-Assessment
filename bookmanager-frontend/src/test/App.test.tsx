@@ -5,11 +5,19 @@ import { render, screen } from '@testing-library/react';
 import App from '../App';
 import store from '../store';
 
+// Mock the ThemeToggle component
+jest.mock('../components/ThemeToggle', () => {
+    return {
+        __esModule: true,
+        default: () => null
+    };
+});
+
 test('renders Book Management heading', () => {
     // Wrap the component in a Provider with the store
     render(
         <Provider store={store}>
-            <App/>
+            <App />
         </Provider>
     );
     const headingElement = screen.getByText(/Book Management/i);

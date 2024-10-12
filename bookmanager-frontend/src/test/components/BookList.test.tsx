@@ -36,7 +36,14 @@ describe('BooksList', () => {
         );
 
         expect(screen.getByText('Books')).toBeInTheDocument();
-        expect(screen.getByText('Book One by Author One (Published: 2021-01-01)')).toBeInTheDocument();
-        expect(screen.getByText('Book Two by Author Two (Published: 2022-02-02)')).toBeInTheDocument();
+        
+        // Check for individual elements instead of the entire string
+        expect(screen.getByText('Book One')).toBeInTheDocument();
+        expect(screen.getByText('by Author One')).toBeInTheDocument();
+        expect(screen.getByText('Published: 2021-01-01')).toBeInTheDocument();
+
+        expect(screen.getByText('Book Two')).toBeInTheDocument();
+        expect(screen.getByText('by Author Two')).toBeInTheDocument();
+        expect(screen.getByText('Published: 2022-02-02')).toBeInTheDocument();
     });
 });
