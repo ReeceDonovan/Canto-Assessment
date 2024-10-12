@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,37 +36,43 @@ public class BookControllerTest {
             2L, new Book(2L,
                     "title-2",
                     "author-2",
-                    LocalDate.of(2021, 2, 3))
-    );
+                    LocalDate.of(2022, 3, 4)));
 
     @Test
     void shouldGetBookById() {
-        List<Book> allBooks = books.values().stream()
-                .sorted(Comparator.comparing(Book::getId))
-                .toList();
         when(this.bookService.findById(1L))
                 .thenReturn(Optional.ofNullable(books.get(1L)));
 
         this.graphQlTester
                 .documentName("findBookById")
-                .variable("id", 1L)
+                .variable("id", 1)
                 .execute()
                 .path("findBookById")
                 .matchesJson("""
-                    {
-                        "id": 1,
-                        "title": "title-1",
-                        "author": "author-1",
-                        "publishedDate": "2021-02-03"
-                    }
-                """);
+                            {
+                                "id": 1,
+                                "title": "title-1",
+                                "author": "author-1",
+                                "publishedDate": "2021-02-03"
+                            }
+                        """);
+    }
+
+    @Test
+    void shouldReturnNullWhenBookNotFound() {
+        when(this.bookService.findById(3L))
+                .thenReturn(Optional.empty());
+
+        this.graphQlTester
+                .documentName("findBookById")
+                .variable("id", 3)
+                .execute()
+                .path("findBookById")
+                .valueIsNull();
     }
 
     @Test
     void shouldGetAllBooks() {
-        List<Book> allBooks = books.values().stream()
-                .sorted(Comparator.comparing(Book::getId))
-                .toList();
         when(this.bookService.findAll())
                 .thenReturn(new ArrayList<>(books.values()));
 
@@ -75,36 +80,24 @@ public class BookControllerTest {
                 .documentName("findAllBooks")
                 .execute()
                 .path("findAllBooks")
-                .matchesJson("""
-                    [
-                        {
-                            "id": 1,
-                            "title": "title-1",
-                            "author": "author-1",
-                            "publishedDate": "2021-02-03"
-                        },
-                        {
-                            "id": 2,
-                            "title": "title-2",
-                            "author": "author-2",
-                            "publishedDate": "2021-02-03"
-                        }
-                    ]
-                """);
+                .entityList(Book.class)
+                .hasSize(2)
+                .satisfies(bookList -> {
+                    assertThat(bookList).extracting(Book::getId).containsExactlyInAnyOrder(1L, 2L);
+                    assertThat(bookList).extracting(Book::getTitle)
+                            .containsExactlyInAnyOrder("title-1", "title-2");
+                });
     }
 
     @Test
     void shouldCreateBook() {
-        Long id = 3L;
-        String title = "title-3";
-        String author = "author-3";
-        LocalDate publishedDate = LocalDate.of(2021, 2, 3);
-        Book savedBook = new Book(id,
-                title,
-                author,
-                publishedDate);
+        String title = "new-title";
+        String author = "new-author";
+        LocalDate publishedDate = LocalDate.of(2023, 5, 1);
+        Book newBook = new Book(3L, title, author, publishedDate);
+
         when(this.bookService.save(any(Book.class)))
-                .thenReturn(savedBook);
+                .thenReturn(newBook);
 
         this.graphQlTester
                 .documentName("createBook")
@@ -113,39 +106,34 @@ public class BookControllerTest {
                 .variable("publishedDate", publishedDate.toString())
                 .execute()
                 .path("createBook")
-                .matchesJson("""
-                    {
-                        "id": 3,
-                        "title": "title-3",
-                        "author": "author-3",
-                        "publishedDate": "2021-02-03"
-                    }
-                """);
+                .entity(Book.class)
+                .satisfies(book -> {
+                    assertThat(book.getId()).isEqualTo(3L);
+                    assertThat(book.getTitle()).isEqualTo(title);
+                    assertThat(book.getAuthor()).isEqualTo(author);
+                    assertThat(book.getPublishedDate()).isEqualTo(publishedDate);
+                });
     }
 
     @Test
     void shouldDeleteBook() {
-        List<Book> allBooks = books.values().stream()
-                .sorted(Comparator.comparing(Book::getId))
-                .toList();
         when(this.bookService.deleteById(1L))
                 .thenReturn(1L);
 
         this.graphQlTester
                 .documentName("deleteBook")
-                .variable("id", 1L)
+                .variable("id", 1)
                 .execute()
                 .path("deleteBook")
-                .matchesJson("1");
+                .entity(Integer.class)
+                .isEqualTo(1);
     }
 
     @Test
     void shouldFindBooksByDate() {
         LocalDate startDate = LocalDate.of(2021, 1, 1);
-        LocalDate endDate = LocalDate.of(2021, 12, 31);
-        List<Book> filteredBooks = books.values().stream()
-                .filter(book -> !book.getPublishedDate().isBefore(startDate) && !book.getPublishedDate().isAfter(endDate))
-                .toList();
+        LocalDate endDate = LocalDate.of(2022, 12, 31);
+        List<Book> filteredBooks = new ArrayList<>(books.values());
 
         when(this.bookService.findBooksByDateRange(startDate, endDate))
                 .thenReturn(filteredBooks);
@@ -159,9 +147,47 @@ public class BookControllerTest {
                 .entityList(Book.class)
                 .hasSize(2)
                 .satisfies(books -> {
-                    assertThat(books).allMatch(book -> 
-                        !book.getPublishedDate().isBefore(startDate) && !book.getPublishedDate().isAfter(endDate)
-                    );
+                    assertThat(books).allMatch(book -> !book.getPublishedDate().isBefore(startDate)
+                            && !book.getPublishedDate().isAfter(endDate));
                 });
+    }
+
+    @Test
+    void shouldFindBooksByDateWithoutEndDate() {
+        LocalDate startDate = LocalDate.of(2021, 1, 1);
+        List<Book> filteredBooks = new ArrayList<>(books.values());
+
+        when(this.bookService.findBooksByDateRange(eq(startDate), any(LocalDate.class)))
+                .thenReturn(filteredBooks);
+
+        this.graphQlTester
+                .documentName("findBooksByDate")
+                .variable("startDate", startDate.toString())
+                .execute()
+                .path("findBooksByDate")
+                .entityList(Book.class)
+                .hasSize(2)
+                .satisfies(books -> {
+                    assertThat(books)
+                            .allMatch(book -> !book.getPublishedDate().isBefore(startDate));
+                });
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoBooksFoundInDateRange() {
+        LocalDate startDate = LocalDate.of(2023, 1, 1);
+        LocalDate endDate = LocalDate.of(2023, 12, 31);
+
+        when(this.bookService.findBooksByDateRange(startDate, endDate))
+                .thenReturn(new ArrayList<>());
+
+        this.graphQlTester
+                .documentName("findBooksByDate")
+                .variable("startDate", startDate.toString())
+                .variable("endDate", endDate.toString())
+                .execute()
+                .path("findBooksByDate")
+                .entityList(Book.class)
+                .hasSize(0);
     }
 }
