@@ -1,10 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export enum ReadingProgress {
+    WANT_TO_READ = 'WANT_TO_READ',
+    READING = 'READING',
+    COMPLETED = 'COMPLETED',
+}
+
 export interface Book {
     id: number;
     title: string;
     author: string;
     publishedDate: string;
+    readingProgress: ReadingProgress;
 }
 
 interface BookState {
@@ -40,9 +47,15 @@ const bookReducer = createSlice({
                 state.deletedBook = null;
             }
         },
+        updateBookProgress(state, action: PayloadAction<{ id: number; progress: ReadingProgress }>) {
+            const book = state.books.find(book => book.id === action.payload.id);
+            if (book) {
+                book.readingProgress = action.payload.progress;
+            }
+        },
     },
 });
 
-export const { setBooks, addBook, deleteBook, undoDeleteBook } = bookReducer.actions;
+export const { setBooks, addBook, deleteBook, undoDeleteBook, updateBookProgress } = bookReducer.actions;
 
 export default bookReducer.reducer;

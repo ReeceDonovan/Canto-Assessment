@@ -3,15 +3,19 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange } from '../../api/api';
+import {
+    deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange,
+    updateBookProgress as updateBookProgressAPI
+} from '../../api/api';
 import BooksList from '../../components/BooksList';
-import booksReducer from '../../features/bookReducer';
+import booksReducer, { ReadingProgress } from '../../features/bookReducer';
 import { RootState } from '../../store';
 
 jest.mock('../../api/api', () => ({
     deleteBook: jest.fn(),
     fetchBooks: jest.fn(),
     fetchBooksByDateRange: jest.fn(),
+    updateBookProgress: jest.fn(),
 }));
 
 jest.setTimeout(10000);
@@ -24,8 +28,8 @@ describe('BooksList', () => {
         initialState = {
             books: {
                 books: [
-                    { id: 1, title: 'Book One', author: 'Author One', publishedDate: '2021-01-01' },
-                    { id: 2, title: 'Book Two', author: 'Author Two', publishedDate: '2022-02-02' },
+                    { id: 1, title: 'Book One', author: 'Author One', publishedDate: '2021-01-01', readingProgress: ReadingProgress.WANT_TO_READ },
+                    { id: 2, title: 'Book Two', author: 'Author Two', publishedDate: '2022-02-02', readingProgress: ReadingProgress.READING },
                 ],
                 deletedBook: null,
             },
@@ -40,7 +44,7 @@ describe('BooksList', () => {
         (fetchBooksByDateRange as jest.Mock).mockResolvedValue(initialState.books.books);
     });
 
-    it('should render a list of books', () => {
+    it('should render a list of books with reading progress', () => {
         render(
             <Provider store={store}>
                 <BooksList />
@@ -50,6 +54,38 @@ describe('BooksList', () => {
         expect(screen.getByText('Books')).toBeInTheDocument();
         expect(screen.getByText('Book One')).toBeInTheDocument();
         expect(screen.getByText('Book Two')).toBeInTheDocument();
+        
+        // Check for the first book's reading progress
+        const firstBookSelect = screen.getAllByLabelText('Reading Progress')[0] as HTMLSelectElement;
+        expect(firstBookSelect.value).toBe(ReadingProgress.WANT_TO_READ);
+
+        // Check for the second book's reading progress
+        const secondBookSelect = screen.getAllByLabelText('Reading Progress')[1] as HTMLSelectElement;
+        expect(secondBookSelect.value).toBe(ReadingProgress.READING);
+    });
+
+    it('should update reading progress when selection changes', async () => {
+        (updateBookProgressAPI as jest.Mock).mockResolvedValue({
+            ...initialState.books.books[0],
+            readingProgress: ReadingProgress.COMPLETED,
+        });
+
+        render(
+            <Provider store={store}>
+                <BooksList />
+            </Provider>
+        );
+
+        const progressSelect = screen.getAllByLabelText('Reading Progress')[0];
+        fireEvent.change(progressSelect, { target: { value: ReadingProgress.COMPLETED } });
+
+        await waitFor(() => {
+            expect(updateBookProgressAPI).toHaveBeenCalledWith(1, ReadingProgress.COMPLETED);
+        });
+
+        await waitFor(() => {
+            expect(screen.getAllByText('COMPLETED')[0]).toBeInTheDocument();
+        });
     });
 
     it('should immediately remove a book from UI when delete button is clicked', async () => {
@@ -134,7 +170,7 @@ describe('BooksList', () => {
     });
 
     it('should filter books by date range', async () => {
-        const filteredBooks = [{ id: 1, title: 'Book One', author: 'Author One', publishedDate: '2021-01-01' }];
+        const filteredBooks = [{ id: 1, title: 'Book One', author: 'Author One', publishedDate: '2021-01-01', readingProgress: ReadingProgress.WANT_TO_READ }];
         (fetchBooksByDateRange as jest.Mock).mockResolvedValue(filteredBooks);
 
         render(

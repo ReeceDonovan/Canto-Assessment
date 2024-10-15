@@ -1,4 +1,4 @@
-import { Book } from '../features/bookReducer';
+import { Book, ReadingProgress } from '../features/bookReducer';
 
 // const GRAPHQL_URL = 'http://localhost:8080/graphql';
 
@@ -15,6 +15,7 @@ export const fetchBooks = async (): Promise<Book[]> => {
                     title
                     author
                     publishedDate
+                    readingProgress
                 }
             }`,
         }),
@@ -45,7 +46,7 @@ export const fetchBookById = async (id: number): Promise<Book> => {
     return data.findBookById;
 };
 
-export const createBook = async (book: Omit<Book, 'id'>): Promise<Book> => {
+export const createBook = async (book: Omit<Book, 'id' | 'readingProgress'>): Promise<Book> => {
     const response = await fetch(GRAPHQL_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,6 +57,7 @@ export const createBook = async (book: Omit<Book, 'id'>): Promise<Book> => {
                     title
                     author
                     publishedDate
+                    readingProgress
                 }
             }`,
             variables: book,
@@ -101,4 +103,26 @@ export const fetchBooksByDateRange = async (startDate: string, endDate?: string)
 
   const { data } = await response.json();
   return data.findBooksByDate;
+};
+
+export const updateBookProgress = async (id: number, progress: ReadingProgress): Promise<Book> => {
+    const response = await fetch(GRAPHQL_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            query: `mutation($id: Int!, $progress: ReadingProgress!) {
+                updateBookProgress(id: $id, progress: $progress) {
+                    id
+                    title
+                    author
+                    publishedDate
+                    readingProgress
+                }
+            }`,
+            variables: { id, progress },
+        }),
+    });
+
+    const { data } = await response.json();
+    return data.updateBookProgress;
 };

@@ -2,8 +2,13 @@ import { Book, Calendar, RotateCcw, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange } from '../api/api';
-import { deleteBook, setBooks, undoDeleteBook } from '../features/bookReducer';
+import {
+    deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange,
+    updateBookProgress as updateBookProgressAPI
+} from '../api/api';
+import {
+    deleteBook, ReadingProgress, setBooks, undoDeleteBook, updateBookProgress
+} from '../features/bookReducer';
 import { RootState } from '../store';
 
 const BooksList = () => {
@@ -57,6 +62,15 @@ const BooksList = () => {
     const handleUndoDelete = () => {
         dispatch(undoDeleteBook());
         setIsUndoVisible(false);
+    };
+
+    const handleProgressChange = async (id: number, progress: ReadingProgress) => {
+        try {
+            const updatedBook = await updateBookProgressAPI(id, progress);
+            dispatch(updateBookProgress({ id, progress: updatedBook.readingProgress }));
+        } catch (error) {
+            console.error('Failed to update book progress:', error);
+        }
     };
 
     return (
@@ -133,6 +147,21 @@ const BooksList = () => {
                                 <p className="text-sm text-gray-500 dark:text-gray-300">
                                     <span className="whitespace-nowrap">Published: {book.publishedDate}</span>
                                 </p>
+                                <div className="mt-2">
+                                    <label htmlFor={`progress-${book.id}`} className="sr-only">Reading Progress</label>
+                                    <select
+                                        id={`progress-${book.id}`}
+                                        value={book.readingProgress}
+                                        onChange={(e) => handleProgressChange(book.id, e.target.value as ReadingProgress)}
+                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                                    >
+                                        {Object.values(ReadingProgress).map((progress) => (
+                                            <option key={progress} value={progress}>
+                                                {progress.replace(/_/g, ' ')}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <button
