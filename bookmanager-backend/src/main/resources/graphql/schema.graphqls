@@ -7,6 +7,7 @@ type Query {
 type Mutation {
     createBook(title: String!, author: String!, publishedDate: String!): Book!
     deleteBook(id: Int!): Int!
+    updateBookProgress(id: Int!, progress: ReadingProgress!): Book!
 }
 
 type Book {
@@ -14,4 +15,11 @@ type Book {
     title: String
     author: String
     publishedDate: String
+    readingProgress: ReadingProgress!
+}
+
+enum ReadingProgress {
+    WANT_TO_READ
+    READING
+    COMPLETED
 }

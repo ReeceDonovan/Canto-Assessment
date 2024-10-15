@@ -3,6 +3,8 @@ package com.acme.bookmanagement.model;
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,8 +18,12 @@ public class Book {
     private String author;
     private LocalDate publishedDate;
 
+    @Enumerated(EnumType.STRING)
+    private ReadingProgress readingProgress;
+
     // Add a default constructor
     public Book() {
+        this.readingProgress = ReadingProgress.WANT_TO_READ;
     }
 
     public Book(Long id, String title, String author, LocalDate publishedDate) {
@@ -25,6 +31,7 @@ public class Book {
         this.title = title;
         this.author = author;
         this.publishedDate = publishedDate;
+        this.readingProgress = ReadingProgress.WANT_TO_READ;
     }
 
     // Getters and Setters
@@ -58,5 +65,19 @@ public class Book {
 
     public void setPublishedDate(LocalDate publishedDate) {
         this.publishedDate = publishedDate;
+    }
+
+    public ReadingProgress getReadingProgress() {
+        return readingProgress;
+    }
+
+    public void setReadingProgress(ReadingProgress readingProgress) {
+        this.readingProgress = readingProgress;
+    }
+
+    public enum ReadingProgress {
+        WANT_TO_READ,
+        READING,
+        COMPLETED
     }
 }

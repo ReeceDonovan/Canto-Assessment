@@ -40,4 +40,14 @@ public class BookService {
                 .filter(book -> !book.getPublishedDate().isBefore(startDate) && !book.getPublishedDate().isAfter(endDate))
                 .collect(Collectors.toList());
     }
+
+    public Book updateReadingProgress(Long id, Book.ReadingProgress progress) {
+        Optional<Book> optionalBook = bookRepository.findById(id);
+        if (optionalBook.isPresent()) {
+            Book book = optionalBook.get();
+            book.setReadingProgress(progress);
+            return bookRepository.save(book);
+        }
+        throw new RuntimeException("Book not found with id: " + id);
+    }
 }
