@@ -4,5 +4,6 @@ query findBookById($id: Int) {
         title
         author
         publishedDate
+        readingProgress
     }
 }

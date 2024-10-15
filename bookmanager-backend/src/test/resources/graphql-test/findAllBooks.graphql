@@ -4,5 +4,6 @@ query findAllBooks {
         title
         author
         publishedDate
+        readingProgress
     }
 }

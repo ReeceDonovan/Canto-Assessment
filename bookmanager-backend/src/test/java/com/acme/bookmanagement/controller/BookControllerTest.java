@@ -1,16 +1,16 @@
 package com.acme.bookmanagement.controller;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.graphql.GraphQlTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -189,5 +189,54 @@ public class BookControllerTest {
                 .path("findBooksByDate")
                 .entityList(Book.class)
                 .hasSize(0);
+    }
+
+    @Test
+    void shouldUpdateBookProgress() {
+        Book updatedBook = new Book(1L, "title-1", "author-1", LocalDate.of(2021, 2, 3));
+        updatedBook.setReadingProgress(Book.ReadingProgress.READING);
+
+        when(this.bookService.updateReadingProgress(1L, Book.ReadingProgress.READING))
+                .thenReturn(updatedBook);
+
+        this.graphQlTester
+                .documentName("updateBookProgress")
+                .variable("id", 1)
+                .variable("progress", "READING")
+                .execute()
+                .path("updateBookProgress")
+                .entity(Book.class)
+                .satisfies(book -> {
+                    assertThat(book.getId()).isEqualTo(1L);
+                    assertThat(book.getReadingProgress()).isEqualTo(Book.ReadingProgress.READING);
+                });
+    }
+
+    @Test
+    void shouldCreateBookWithDefaultReadingProgress() {
+        String title = "new-title";
+        String author = "new-author";
+        LocalDate publishedDate = LocalDate.of(2023, 5, 1);
+        Book newBook = new Book(3L, title, author, publishedDate);
+        newBook.setReadingProgress(Book.ReadingProgress.WANT_TO_READ);
+
+        when(this.bookService.save(any(Book.class)))
+                .thenReturn(newBook);
+
+        this.graphQlTester
+                .documentName("createBook")
+                .variable("title", title)
+                .variable("author", author)
+                .variable("publishedDate", publishedDate.toString())
+                .execute()
+                .path("createBook")
+                .entity(Book.class)
+                .satisfies(book -> {
+                    assertThat(book.getId()).isEqualTo(3L);
+                    assertThat(book.getTitle()).isEqualTo(title);
+                    assertThat(book.getAuthor()).isEqualTo(author);
+                    assertThat(book.getPublishedDate()).isEqualTo(publishedDate);
+                    assertThat(book.getReadingProgress()).isEqualTo(Book.ReadingProgress.WANT_TO_READ);
+                });
     }
 }

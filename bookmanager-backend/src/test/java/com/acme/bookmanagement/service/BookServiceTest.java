@@ -1,17 +1,22 @@
 package com.acme.bookmanagement.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.acme.bookmanagement.model.Book;
 import com.acme.bookmanagement.repository.BookRepository;
@@ -106,5 +111,37 @@ class BookServiceTest {
         List<Book> result = bookService.findBooksByDateRange(startDate, endDate);
         assertEquals(1, result.size());
         assertTrue(result.contains(book1));
+    }
+
+    @Test
+    void testUpdateReadingProgress() {
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
+        when(bookRepository.save(any(Book.class))).thenReturn(book1);
+
+        Book updatedBook = bookService.updateReadingProgress(1L, Book.ReadingProgress.READING);
+
+        assertEquals(Book.ReadingProgress.READING, updatedBook.getReadingProgress());
+        verify(bookRepository).save(book1);
+    }
+
+    @Test
+    void testUpdateReadingProgressBookNotFound() {
+        when(bookRepository.findById(3L)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> {
+            bookService.updateReadingProgress(3L, Book.ReadingProgress.READING);
+        });
+    }
+
+    @Test
+    void testSaveWithDefaultReadingProgress() {
+        Book newBook = new Book(null, "new-title", "new-author", LocalDate.now());
+        Book savedBook = new Book(3L, "new-title", "new-author", LocalDate.now());
+        when(bookRepository.save(newBook)).thenReturn(savedBook);
+
+        Book result = bookService.save(newBook);
+
+        assertEquals(Book.ReadingProgress.WANT_TO_READ, result.getReadingProgress());
+        verify(bookRepository).save(newBook);
     }
 }
