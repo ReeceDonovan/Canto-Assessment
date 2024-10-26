@@ -828,8 +828,8 @@ main {
   padding-left: 0.75rem;
 }
 
-.pr-10 {
-  padding-right: 2.5rem;
+.pr-2 {
+  padding-right: 0.5rem;
 }
 
 .pt-12 {
@@ -1151,6 +1151,10 @@ main {
 
   .sm\:p-6 {
     padding: 1.5rem;
+  }
+
+  .sm\:pr-10 {
+    padding-right: 2.5rem;
   }
 
   .sm\:text-left {

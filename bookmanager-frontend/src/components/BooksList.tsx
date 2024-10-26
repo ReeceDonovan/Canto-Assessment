@@ -153,7 +153,7 @@ const BooksList = () => {
                                         id={`progress-${book.id}`}
                                         value={book.readingProgress}
                                         onChange={(e) => handleProgressChange(book.id, e.target.value as ReadingProgress)}
-                                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-600 text-gray-700 dark:text-white"
+                                        className="mt-1 block w-full pl-3 pr-2 sm:pr-10 py-2 text-base border-gray-300 dark:border-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-600 text-gray-700 dark:text-white"
                                     >
                                         {Object.values(ReadingProgress).map((progress) => (
                                             <option key={progress} value={progress}>
