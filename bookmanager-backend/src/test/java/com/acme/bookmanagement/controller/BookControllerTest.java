@@ -49,12 +49,12 @@ public class BookControllerTest {
                                 .execute()
                                 .path("findBookById")
                                 .matchesJson("""
-                                                    {
+                                                {
                                                         "id": 1,
                                                         "title": "title-1",
                                                         "author": "author-1",
                                                         "publishedDate": "2021-02-03"
-                                                    }
+                                                }
                                                 """);
         }
 
@@ -146,11 +146,9 @@ public class BookControllerTest {
                                 .path("findBooksByDate")
                                 .entityList(Book.class)
                                 .hasSize(2)
-                                .satisfies(bookList -> {
-                                        assertThat(bookList)
-                                                        .allMatch(book -> !book.getPublishedDate().isBefore(startDate)
-                                                                        && !book.getPublishedDate().isAfter(endDate));
-                                });
+                                .satisfies(bookList -> assertThat(bookList)
+                                                .allMatch(book -> !book.getPublishedDate().isBefore(startDate)
+                                                                && !book.getPublishedDate().isAfter(endDate)));
         }
 
         @Test
@@ -168,10 +166,8 @@ public class BookControllerTest {
                                 .path("findBooksByDate")
                                 .entityList(Book.class)
                                 .hasSize(2)
-                                .satisfies(bookList -> {
-                                        assertThat(bookList)
-                                                        .allMatch(book -> !book.getPublishedDate().isBefore(startDate));
-                                });
+                                .satisfies(bookList -> assertThat(bookList)
+                                                .allMatch(book -> !book.getPublishedDate().isBefore(startDate)));
         }
 
         @Test

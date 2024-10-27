@@ -23,6 +23,7 @@ import com.acme.bookmanagement.model.Book;
 import com.acme.bookmanagement.repository.BookRepository;
 
 class BookServiceTest {
+
     private BookRepository bookRepository;
     private BookService bookService;
 
@@ -148,9 +149,8 @@ class BookServiceTest {
     void testUpdateReadingProgressBookNotFound() {
         when(bookRepository.findById(3L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            bookService.updateReadingProgress(3L, Book.ReadingProgress.READING);
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> bookService.updateReadingProgress(3L, Book.ReadingProgress.READING));
         assertEquals("Book not found with id: 3", exception.getMessage());
     }
 
@@ -182,9 +182,7 @@ class BookServiceTest {
 
     @Test
     void testUndoDeleteNonExistentBook() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            bookService.undoDelete(3L);
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> bookService.undoDelete(3L));
         assertEquals("Book not found in recently deleted items with id: 3", exception.getMessage());
     }
 
@@ -206,9 +204,7 @@ class BookServiceTest {
         Book undeletedBook2 = bookService.undoDelete(2L);
         assertEquals(testBook2, undeletedBook2);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            bookService.undoDelete(1L);
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> bookService.undoDelete(1L));
         assertEquals("Book not found in recently deleted items with id: 1", exception.getMessage());
     }
 }
