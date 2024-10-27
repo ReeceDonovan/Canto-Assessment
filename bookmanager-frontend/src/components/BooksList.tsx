@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {
     deleteBook as deleteBookAPI, fetchBooks, fetchBooksByDateRange,
-    updateBookProgress as updateBookProgressAPI
+    undoDeleteBook as undoDeleteBookAPI, updateBookProgress as updateBookProgressAPI
 } from '../api/api';
 import {
     deleteBook, ReadingProgress, setBooks, undoDeleteBook, updateBookProgress
@@ -59,9 +59,17 @@ const BooksList = () => {
         }
     };
 
-    const handleUndoDelete = () => {
-        dispatch(undoDeleteBook());
-        setIsUndoVisible(false);
+    const handleUndoDelete = async () => {
+        if (deletedBook) {
+            try {
+                const restoredBook = await undoDeleteBookAPI(deletedBook.id);
+                dispatch(undoDeleteBook());
+                dispatch(setBooks([...books, restoredBook]));
+                setIsUndoVisible(false);
+            } catch (error) {
+                console.error('Failed to undo delete:', error);
+            }
+        }
     };
 
     const handleProgressChange = async (id: number, progress: ReadingProgress) => {
@@ -164,6 +172,7 @@ const BooksList = () => {
                                 </div>
                             </div>
                         </div>
+                        {/* Delete button */}
                         <button
                             onClick={() => handleDeleteBook(book.id)}
                             className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200 sm:p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400"
