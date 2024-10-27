@@ -146,9 +146,10 @@ public class BookControllerTest {
                                 .path("findBooksByDate")
                                 .entityList(Book.class)
                                 .hasSize(2)
-                                .satisfies(books -> {
-                                        assertThat(books).allMatch(book -> !book.getPublishedDate().isBefore(startDate)
-                                                        && !book.getPublishedDate().isAfter(endDate));
+                                .satisfies(bookList -> {
+                                        assertThat(bookList)
+                                                        .allMatch(book -> !book.getPublishedDate().isBefore(startDate)
+                                                                        && !book.getPublishedDate().isAfter(endDate));
                                 });
         }
 
@@ -167,8 +168,8 @@ public class BookControllerTest {
                                 .path("findBooksByDate")
                                 .entityList(Book.class)
                                 .hasSize(2)
-                                .satisfies(books -> {
-                                        assertThat(books)
+                                .satisfies(bookList -> {
+                                        assertThat(bookList)
                                                         .allMatch(book -> !book.getPublishedDate().isBefore(startDate));
                                 });
         }
