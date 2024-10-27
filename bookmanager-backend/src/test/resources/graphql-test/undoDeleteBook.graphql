@@ -1,0 +1,9 @@
+mutation undoDeleteBook($id: Int!) {
+    undoDeleteBook(id: $id) {
+        id
+        title
+        author
+        publishedDate
+        readingProgress
+    }
+}
