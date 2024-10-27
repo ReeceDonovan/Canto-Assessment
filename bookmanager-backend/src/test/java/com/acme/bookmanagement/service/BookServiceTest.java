@@ -30,7 +30,7 @@ class BookServiceTest {
     private final Book book2 = new Book(2L, "title-2", "author-2", LocalDate.of(2022, 3, 4));
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         bookRepository = Mockito.mock(BookRepository.class);
         bookService = new BookService(bookRepository);
     }
@@ -148,9 +148,10 @@ class BookServiceTest {
     void testUpdateReadingProgressBookNotFound() {
         when(bookRepository.findById(3L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             bookService.updateReadingProgress(3L, Book.ReadingProgress.READING);
         });
+        assertEquals("Book not found with id: 3", exception.getMessage());
     }
 
     @Test
@@ -181,31 +182,33 @@ class BookServiceTest {
 
     @Test
     void testUndoDeleteNonExistentBook() {
-        assertThrows(RuntimeException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             bookService.undoDelete(3L);
         });
+        assertEquals("Book not found in recently deleted items with id: 3", exception.getMessage());
     }
 
     @Test
     void testDeleteByIdAndUndoDeleteMultipleTimes() {
-        Book book1 = new Book(1L, "title-1", "author-1", LocalDate.of(2021, 2, 3));
-        Book book2 = new Book(2L, "title-2", "author-2", LocalDate.of(2022, 3, 4));
+        Book testBook1 = new Book(1L, "title-1", "author-1", LocalDate.of(2021, 2, 3));
+        Book testBook2 = new Book(2L, "title-2", "author-2", LocalDate.of(2022, 3, 4));
 
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
-        when(bookRepository.findById(2L)).thenReturn(Optional.of(book2));
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(testBook1));
+        when(bookRepository.findById(2L)).thenReturn(Optional.of(testBook2));
         when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         bookService.deleteById(1L);
         bookService.deleteById(2L);
 
         Book undeletedBook1 = bookService.undoDelete(1L);
-        assertEquals(book1, undeletedBook1);
+        assertEquals(testBook1, undeletedBook1);
 
         Book undeletedBook2 = bookService.undoDelete(2L);
-        assertEquals(book2, undeletedBook2);
+        assertEquals(testBook2, undeletedBook2);
 
-        assertThrows(RuntimeException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             bookService.undoDelete(1L);
         });
+        assertEquals("Book not found in recently deleted items with id: 1", exception.getMessage());
     }
 }
