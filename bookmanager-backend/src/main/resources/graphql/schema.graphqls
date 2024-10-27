@@ -8,6 +8,7 @@ type Mutation {
     createBook(title: String!, author: String!, publishedDate: String!): Book!
     deleteBook(id: Int!): Int!
     updateBookProgress(id: Int!, progress: ReadingProgress!): Book!
+    undoDeleteBook(id: Int!): Book!
 }
 
 type Book {
