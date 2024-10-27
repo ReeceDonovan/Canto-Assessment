@@ -55,4 +55,9 @@ public class BookController {
     public Book updateBookProgress(@Argument Long id, @Argument Book.ReadingProgress progress) {
         return bookService.updateReadingProgress(id, progress);
     }
+
+    @MutationMapping
+    public Book undoDeleteBook(@Argument Long id) {
+        return bookService.undoDelete(id);
+    }
 }
