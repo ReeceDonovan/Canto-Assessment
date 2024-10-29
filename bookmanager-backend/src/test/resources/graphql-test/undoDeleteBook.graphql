@@ -1,5 +1,5 @@
-query findAllBooks {
-    findAllBooks {
+mutation undoDeleteBook($id: Int!) {
+    undoDeleteBook(id: $id) {
         id
         title
         author

@@ -1,0 +1,9 @@
+mutation updateBookProgress($id: Int!, $progress: ReadingProgress!) {
+    updateBookProgress(id: $id, progress: $progress) {
+        id
+        title
+        author
+        publishedDate
+        readingProgress
+    }
+}

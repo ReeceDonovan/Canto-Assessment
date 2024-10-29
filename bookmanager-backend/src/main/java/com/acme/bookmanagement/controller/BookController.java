@@ -50,4 +50,14 @@ public class BookController {
         LocalDate end = endDate != null ? LocalDate.parse(endDate) : LocalDate.now();
         return bookService.findBooksByDateRange(start, end);
     }
+
+    @MutationMapping
+    public Book updateBookProgress(@Argument Long id, @Argument Book.ReadingProgress progress) {
+        return bookService.updateReadingProgress(id, progress);
+    }
+
+    @MutationMapping
+    public Book undoDeleteBook(@Argument Long id) {
+        return bookService.undoDelete(id);
+    }
 }

@@ -4,5 +4,6 @@ query findBooksByDate($startDate: String!, $endDate: String) {
         title
         author
         publishedDate
+        readingProgress
     }
 }

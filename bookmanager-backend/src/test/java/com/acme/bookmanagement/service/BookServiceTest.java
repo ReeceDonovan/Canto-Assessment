@@ -1,22 +1,29 @@
 package com.acme.bookmanagement.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.acme.bookmanagement.model.Book;
 import com.acme.bookmanagement.repository.BookRepository;
 
 class BookServiceTest {
+
     private BookRepository bookRepository;
     private BookService bookService;
 
@@ -24,7 +31,7 @@ class BookServiceTest {
     private final Book book2 = new Book(2L, "title-2", "author-2", LocalDate.of(2022, 3, 4));
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         bookRepository = Mockito.mock(BookRepository.class);
         bookService = new BookService(bookRepository);
     }
@@ -71,8 +78,27 @@ class BookServiceTest {
 
     @Test
     void testDeleteById() {
-        bookService.deleteById(1L);
-        verify(bookRepository, times(1)).deleteById(1L);
+        Long bookId = 1L;
+        Book book = new Book(bookId, "title-1", "author-1", LocalDate.of(2021, 2, 3));
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        Long deletedId = bookService.deleteById(bookId);
+
+        assertEquals(bookId, deletedId);
+        verify(bookRepository, times(1)).findById(bookId);
+        verify(bookRepository, times(1)).deleteById(bookId);
+    }
+
+    @Test
+    void testDeleteByIdBookNotFound() {
+        Long bookId = 1L;
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+        Long deletedId = bookService.deleteById(bookId);
+
+        assertEquals(bookId, deletedId);
+        verify(bookRepository, times(1)).findById(bookId);
+        verify(bookRepository, never()).deleteById(bookId);
     }
 
     @Test
@@ -106,5 +132,79 @@ class BookServiceTest {
         List<Book> result = bookService.findBooksByDateRange(startDate, endDate);
         assertEquals(1, result.size());
         assertTrue(result.contains(book1));
+    }
+
+    @Test
+    void testUpdateReadingProgress() {
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
+        when(bookRepository.save(any(Book.class))).thenReturn(book1);
+
+        Book updatedBook = bookService.updateReadingProgress(1L, Book.ReadingProgress.READING);
+
+        assertEquals(Book.ReadingProgress.READING, updatedBook.getReadingProgress());
+        verify(bookRepository).save(book1);
+    }
+
+    @Test
+    void testUpdateReadingProgressBookNotFound() {
+        when(bookRepository.findById(3L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> bookService.updateReadingProgress(3L, Book.ReadingProgress.READING));
+        assertEquals("Book not found with id: 3", exception.getMessage());
+    }
+
+    @Test
+    void testSaveWithDefaultReadingProgress() {
+        Book newBook = new Book(null, "new-title", "new-author", LocalDate.now());
+        Book savedBook = new Book(3L, "new-title", "new-author", LocalDate.now());
+        when(bookRepository.save(newBook)).thenReturn(savedBook);
+
+        Book result = bookService.save(newBook);
+
+        assertEquals(Book.ReadingProgress.WANT_TO_READ, result.getReadingProgress());
+        verify(bookRepository).save(newBook);
+    }
+
+    @Test
+    void testDeleteByIdAndUndoDelete() {
+        Book book = new Book(1L, "title-1", "author-1", LocalDate.of(2021, 2, 3));
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        when(bookRepository.save(book)).thenReturn(book);
+
+        bookService.deleteById(1L);
+        verify(bookRepository, times(1)).deleteById(1L);
+
+        Book undeletedBook = bookService.undoDelete(1L);
+        assertEquals(book, undeletedBook);
+        verify(bookRepository, times(1)).save(book);
+    }
+
+    @Test
+    void testUndoDeleteNonExistentBook() {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> bookService.undoDelete(3L));
+        assertEquals("Book not found in recently deleted items with id: 3", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteByIdAndUndoDeleteMultipleTimes() {
+        Book testBook1 = new Book(1L, "title-1", "author-1", LocalDate.of(2021, 2, 3));
+        Book testBook2 = new Book(2L, "title-2", "author-2", LocalDate.of(2022, 3, 4));
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(testBook1));
+        when(bookRepository.findById(2L)).thenReturn(Optional.of(testBook2));
+        when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        bookService.deleteById(1L);
+        bookService.deleteById(2L);
+
+        Book undeletedBook1 = bookService.undoDelete(1L);
+        assertEquals(testBook1, undeletedBook1);
+
+        Book undeletedBook2 = bookService.undoDelete(2L);
+        assertEquals(testBook2, undeletedBook2);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> bookService.undoDelete(1L));
+        assertEquals("Book not found in recently deleted items with id: 1", exception.getMessage());
     }
 }
